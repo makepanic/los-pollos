@@ -1,0 +1,21 @@
+{
+  "typeRoots": [
+    "node_modules/@types"
+  ],
+  "include": [
+    "lib/**/*",
+    "boot.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "build",
+    "module": "commonjs",
+    "target": "es6",
+    "moduleResolution": "node",
+    "lib": [
+      "es5",
+      "es2015.core",
+      "es2015.collection",
+      "es2017"
+    ]
+  }
+}

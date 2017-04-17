@@ -1,0 +1,29 @@
+{
+  "name": "los-pollos",
+  "version": "1.0.4",
+  "description": "",
+  "main": "build/boot.js",
+  "scripts": {
+    "lint": "node node_modules/.bin/tslint lib",
+    "pretest": "npm run lint && npm run build",
+    "test": "mocha",
+    "build": "./node_modules/.bin/tsc"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/bunyan": "0.0.36",
+    "bluebird": "^3.5.0",
+    "bunyan": "^1.8.10",
+    "got": "^6.7.1",
+    "slackbots": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.12",
+    "eslint": "^3.19.0",
+    "mocha": "^3.2.0",
+    "nock": "^9.0.13",
+    "tslint": "^5.1.0",
+    "typescript": "^2.2.2"
+  }
+}
