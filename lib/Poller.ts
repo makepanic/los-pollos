@@ -27,7 +27,7 @@ class Poller {
   }
 
   isError(result) {
-    const errorCodes = [502, 503, 504];
+    const errorCodes = [502, 503, 504, 404];
 
     return errorCodes.includes(result.statusCode) ||
       result.code === 'ECONNREFUSED';
