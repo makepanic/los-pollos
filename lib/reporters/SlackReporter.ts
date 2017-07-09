@@ -4,12 +4,20 @@ import fs = require('fs');
 import assert = require('assert');
 import path = require('path');
 import SlackBot = require('slackbots');
+import chunk = require('lodash.chunk');
 
 class SlackReporter implements IReporter {
   bot: any;
   channel = 'status';
-  symbolWentDown = '↧';
-  symbolWentUp = '↥';
+
+  emojiInstanceUp = ':pollos-up:';
+  emojiInstanceWentUp = ':pollos-went-up:';
+  emojiInstanceDown = ':pollos-down:';
+  emojiInstanceWentDown = ':pollos-went-down:';
+
+  emojiLevelDown = ':heart:';
+  emojiLevelPending = ':yellow_heart:';
+  emojiLevelUp = ':green_heart:';
 
   constructor(token) {
     this.bot = new SlackBot({token});
@@ -23,14 +31,7 @@ class SlackReporter implements IReporter {
     });
   }
 
-  titleForChanges(level, changes) {
-    const changesList = changes
-      .map(([level, instance, url, up]) => `${instance} ${up ? this.symbolWentUp : this.symbolWentDown}`).join(' ,');
-
-    return `${level}: ${changesList}`;
-  }
-
-  postChangeMessage(options){
+  postChangeMessage(options) {
     this.bot.postMessageToChannel(this.channel, '', options);
   }
 
@@ -41,31 +42,35 @@ class SlackReporter implements IReporter {
       return hasLevel ? changedLevels : changedLevels.concat(level);
     }, []);
 
+    // get list of all instances in level
     changedLevels.forEach((level) => {
-      // get list of all instances in level
       const levelInstances = changes.filter(([l]) => l === level);
       const levelState = state.filter(([l]) => l === level);
 
       const allDown = levelState.every(([level, instance, url, up]) => !up);
       const someDown = levelState.some(([level, instance, url, up]) => !up);
-      const title = this.titleForChanges(level, levelInstances);
-      const color = allDown ? 'danger' : someDown ? 'warning' : 'good';
-      const fields = levelState.map(([level, instance, url, up]) => {
-        return {
-          title: instance,
-          short: true,
-          value: `is ${up ? 'up :sharkdance:' : 'down :unacceptable:'}`
+      const colorIcon = allDown ? this.emojiLevelDown : someDown ? this.emojiLevelPending : this.emojiLevelUp;
+
+      // calulate padding length based on longest instance name
+      const padLength = levelState.reduce((maxLength, [level, instance]) => Math.max(maxLength, instance.length), 0);
+      const levelTexts = levelState.map(([level, instance, url, up]) => {
+        const changed = levelInstances.find(([_, changedInstance]) => changedInstance === instance);
+        let icon = up ? this.emojiInstanceUp : this.emojiInstanceDown;
+
+        if (changed) {
+          icon = changed[3] ? this.emojiInstanceWentUp : this.emojiInstanceWentDown;
         }
+
+        return `${icon} \`${instance.padEnd(padLength, ' ')}\``;
       });
+
+      const levelTextBlocks = chunk(levelTexts, 3)
+        .map((_chunk) => _chunk.join(' '))
+        .join('\n');
 
       this.postChangeMessage({
         as_user: true,
-        attachments: JSON.stringify([{
-          color,
-          title,
-          fallback: title,
-          fields
-        }])
+        text: `${colorIcon} *${level}*\n${levelTextBlocks}\n-`,
       });
     });
   }

@@ -7,6 +7,8 @@ class Poller {
   reporters: Array<Reporter> = [];
   running: boolean = false;
   interval: number = 15 * 1000;
+  timeout: number = 10 * 1000;
+  retries: number = 0;
 
   constructor(checks: Array<PollInstance>, reporters: Array<Reporter>) {
     this.reporters = reporters;
@@ -17,7 +19,10 @@ class Poller {
 
   request(url) {
     const before = Date.now();
-    return got(url).then((response) => {
+    return got(url, {
+      timeout: this.timeout,
+      retries: this.retries,
+    }).then((response) => {
       response._duration = Date.now() - before;
       return response;
     }).catch(error => {
@@ -27,10 +32,11 @@ class Poller {
   }
 
   isError(result) {
-    const errorCodes = [502, 503, 504, 404];
+    const errorCodes = [502, 503, 504, 404, 400];
 
     return errorCodes.includes(result.statusCode) ||
-      result.code === 'ECONNREFUSED';
+      result.code === 'ECONNREFUSED' ||
+      result.code === 'ETIMEDOUT';
   }
 
   diffState(newState: Array<PollState>): Array<PollState> {
