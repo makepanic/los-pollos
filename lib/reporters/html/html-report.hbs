@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Status - Los Pollos</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAACXBIWXMAAAxNAAAMTQHSzq1OAAAAFnpUWHRUaXRsZQAACJlLSyzLTM7PAwALfgLniaN4zQAAAIZJREFUKM9jYBhwsFVV9b+MjMx/QuoY0TXB2OnfvzM8efKEEZdGJhhjXwoDWJNV4W2iXAbX6DQHYvuxflWGZmFhDIXozmfEpgCIwWygU5HFwXyY85nwOQekGGYIOmDBpxFmIzbNjDhs+o+uGNmZODViCwx8UYMB3k9j+A+LJpzRgU0TTZImAF9dMi878PpKAAAAAElFTkSuQmCC">
+  <style>
+    /* // @formatter:off */
+    /*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,footer,header,nav,section{display:block}h1{font-size:2em;margin:.67em 0}figcaption,figure,main{display:block}figure{margin:1em 40px}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent;-webkit-text-decoration-skip:objects}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:inherit}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}dfn{font-style:italic}mark{background-color:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}audio,video{display:inline-block}audio:not([controls]){display:none;height:0}img{border-style:none}svg:not(:root){overflow:hidden}button,input,optgroup,select,textarea{font-family:sans-serif;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}[type=reset],[type=submit],button,html [type=button]{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{display:inline-block;vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details,menu{display:block}summary{display:list-item}canvas{display:inline-block}template{display:none}[hidden]{display:none}
+    /* // @formatter:on */
+
+    :root {
+      --border-color: #dee2e6;
+      --down-border-color: #c92a2a;
+      --down-color: #f03e3e;
+      --up-border-color: #ced4da;
+      --up-color: #e9ecef;
+      --bar-height: 20px;
+      --bar-tooltip-color: #495057;
+      --tooltip-size: 5px;
+    }
+
+    body {
+      font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      background-color: #f1f3f5;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: lighter;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      padding: 20px 0;
+    }
+
+    .chicken {
+      /* base size 12x12 */
+      width: 48px;
+      height: 48px;
+      background-size: 700%;
+      /* via https://opengameart.org/content/chicken-sprites @ https://twitter.com/Shepardskin */
+      background-image: url(data:image/png;base64,{{logoBase64}});
+      background-position: 0 0;
+
+      image-rendering: optimizeSpeed; /* STOP SMOOTHING, GIVE ME SPEED  */
+      image-rendering: -moz-crisp-edges; /* Firefox                        */
+      image-rendering: -o-crisp-edges; /* Opera                          */
+      image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+      image-rendering: pixelated; /* Chrome */
+      image-rendering: optimize-contrast; /* CSS3 Proposed                  */
+      -ms-interpolation-mode: nearest-neighbor; /* IE8+                           */
+      margin: 0 auto;
+    }
+
+    .level {
+      margin-bottom: 30px;
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+    }
+
+    .level__name {
+      background-color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .lavel__status {
+
+    }
+
+    .level__instances {
+      padding: 10px 20px 20px 20px;
+    }
+
+    .level-instance {
+      width: 33.33%;
+      display: inline-block;
+      vertical-align: top;
+      box-sizing: border-box;
+    }
+
+    .level-instance__content {
+      padding: 10px;
+    }
+
+    .level-instance__status {
+      width: 15px;
+      height: 15px;
+      border-radius: 15px;
+      box-sizing: border-box;
+      display: inline-block;
+      vertical-align: middle;
+
+      background-color: transparent;
+      border: 1px solid transparent;
+    }
+
+    .level-instance__name {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .level-instance__bar {
+
+    }
+
+    .level-instance--online .level-instance__status {
+      background-color: var(--up-color);
+      border-color: var(--up-border-color);
+    }
+
+    .level-instance--offline .level-instance__status {
+      background-color: var(--down-color);
+      border-color: var(--down-border-color);
+    }
+
+    .level__bars {
+      display: flex;
+    }
+
+    .level-bar {
+      flex: 1;
+      margin: 2px;
+      height: var(--bar-height);
+      border: 1px solid transparent;
+      box-sizing: border-box;
+      position: relative;
+      cursor: help;
+    }
+
+    .level-bar:hover .level-bar__tooltip {
+      opacity: 1;
+    }
+
+    .level-bar--online {
+      background-color: #69db7c;
+      border-color: #40c057;
+    }
+
+    .level-bar--offline {
+      background-color: var(--down-color);
+      border-color: var(--down-border-color);
+    }
+
+    .level-bar__center {
+      width: 1px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .level-bar__tooltip {
+      position: absolute;
+      top: var(--bar-height);
+      background-color: var(--bar-tooltip-color);
+      color: white;
+      max-width: 200px;
+      text-align: center;
+      border-radius: 3px;
+      padding: 2px 10px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity .2s;
+      transform: translateX(-50%);
+    }
+
+    .level-bar__tooltip::before {
+      content: '';
+      border: var(--tooltip-size) solid transparent;
+      position: absolute;
+      border-bottom-color: var(--bar-tooltip-color);
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .footer{
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 50px;
+      font-size: 14px;
+      color: #868e96;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="content">
+  <div class="header">
+    <div class="chicken" title="bwok bwok bwak!"></div>
+  </div>
+
+  <div class="levels">
+    {{#each levels as |level|}}
+      <div class="level">
+        <h2 class="level__name">{{@key}}</h2>
+
+        <div class="level__bars">
+          {{#each level.instances as |instance|~}}
+            <div class="level-bar {{#if this.online}}level-bar--online{{else}}level-bar--offline{{/if}}">
+              <div class="level-bar__center">
+                <div class="level-bar__tooltip">{{capitalize @key}}</div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+
+        <div class="level__instances">
+          {{#each level.instances as |instance|~}}
+            {{#if (not this.online)~}}
+              <div
+                class="level__instance level-instance level-instance--{{#if this.online}}online{{else}}offline{{/if}}">
+                <div class="level-instance__content">
+                  <div class="level-instance__status"></div>
+                  <div class="level-instance__name">{{capitalize @key}}</div>
+                </div>
+              </div>
+            {{~/if}}
+          {{~/each}}
+        </div>
+      </div>
+    {{/each}}
+  </div>
+
+  <div class="footer"><strong title="Updated at">🕓 {{updated}}</strong></div>
+</div>
+
+<script>
+  (function () {
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    /*
+    0  1  2  3  4  5  6
+    7  8  9  10 11 12 13
+    14 15 16 17 18 19 20
+     */
+    const reloadTimeout = 60 * 1000;
+    const chicken = document.querySelector('.chicken');
+    const width = 48;
+    const height = 48;
+    const columns = 7;
+    const animations = [
+      [0, 1],
+      [7, 8],
+      [14, 15],
+      [2],
+      [9],
+      [16],
+      [3, 4, 5, 6],
+      [10, 11, 12, 13],
+      [17, 18, 19, 20]
+    ];
+    let currentAnimation = animations[0];
+    let currentAnimationFrame = 0;
+
+    function playAnimation(animation, animationFrame) {
+      const nextFrame = animation[animationFrame];
+      const column = nextFrame % columns;
+      const row = Math.floor(nextFrame / columns);
+
+      chicken.style.backgroundPosition = `-${column * width}px -${row * height}px`;
+    }
+
+    function stepAnimation(){
+      playAnimation(currentAnimation, currentAnimationFrame);
+
+      if (currentAnimationFrame + 1 > currentAnimation.length) {
+        currentAnimationFrame = 0;
+        currentAnimation = animations[getRandomInt(0, animations.length - 1)];
+      } else {
+        currentAnimationFrame++;
+      }
+
+      setTimeout(() => stepAnimation(), getRandomInt(100, 300));
+    }
+
+    stepAnimation();
+    setTimeout(() => location.reload(true), reloadTimeout);
+  }());
+</script>
+
+</body>
+</html>

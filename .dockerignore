@@ -3,7 +3,7 @@
 coverage
 node_modules
 targets
-lib
+lib/**/*.ts
 boot.ts
 
 # Node.gitignore https://github.com/github/gitignore/blob/master/Node.gitignore

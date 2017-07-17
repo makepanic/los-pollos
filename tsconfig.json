@@ -7,7 +7,6 @@
     "boot.ts"
   ],
   "compilerOptions": {
-    "outDir": "build",
     "module": "commonjs",
     "target": "es6",
     "moduleResolution": "node",

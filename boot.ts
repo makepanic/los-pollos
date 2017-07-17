@@ -1,9 +1,8 @@
 import Poller = require("./lib/Poller");
-import CsvReporter = require("./lib/reporters/CsvReporter");
-import path = require('path');
 import assert = require('assert');
 import {PollInstance} from "./lib/Types";
 import SlackReporter = require("./lib/reporters/SlackReporter");
+import HTMLReporter = require("./lib/reporters/HTMLReporter");
 
 assert(typeof process.env.SLACK_TOKEN === 'string', 'Provided slack token via environment variable SLACK_TOKEN');
 assert(typeof process.env.POLL_TARGET === 'string', 'Requires poll target JSON object');
@@ -20,7 +19,8 @@ const checks: Array<PollInstance> = <Array<PollInstance>>Object
   .reduce((all, item) => all.concat(item), []);
 
 const reporters = [
-  new SlackReporter(SLACK_TOKEN)
+  new SlackReporter(SLACK_TOKEN),
+  new HTMLReporter()
 ];
 
 const poller = new Poller(checks, reporters);

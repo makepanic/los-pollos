@@ -1,6 +1,6 @@
 {
   "name": "los-pollos",
-  "version": "1.0.12",
+  "version": "1.0.5",
   "description": "",
   "main": "build/boot.js",
   "scripts": {
@@ -13,9 +13,11 @@
   "license": "MIT",
   "dependencies": {
     "@types/bunyan": "0.0.36",
+    "@types/handlebars": "^4.0.34",
     "bluebird": "^3.5.0",
     "bunyan": "^1.8.10",
     "got": "^6.7.1",
+    "handlebars": "^4.0.10",
     "lodash.chunk": "^4.2.0",
     "slackbots": "^1.0.2"
   },

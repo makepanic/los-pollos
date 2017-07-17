@@ -1,8 +1,5 @@
 import IReporter = require("./IReporter");
 import {PollState} from "../Types";
-import fs = require('fs');
-import assert = require('assert');
-import path = require('path');
 import SlackBot = require('slackbots');
 import chunk = require('lodash.chunk');
 
