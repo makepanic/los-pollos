@@ -9,17 +9,37 @@ Handlebars.registerHelper('capitalize', function (text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 });
 
+interface Images {
+  logoUp?: string;
+  logoDown?: string;
+  faviconUp?: string;
+  faviconDown?: string;
+}
+
 class HTMLReporter implements IReporter {
   templatePath: string = path.join(__dirname, 'html', 'html-report.hbs');
-  logoPath: string = path.join(__dirname, '..', '..', 'assets', 'chicken.small.png');
-  logoBase64: Buffer;
+
+  imagePaths: Images = {
+    logoUp: path.join(__dirname, '..', '..', 'assets', 'chicken.up.small.png'),
+    logoDown: path.join(__dirname, '..', '..', 'assets', 'chicken.down.small.png'),
+    faviconUp: path.join(__dirname, '..', '..', 'assets', 'favicon.up.png'),
+    faviconDown: path.join(__dirname, '..', '..', 'assets', 'favicon.down.png'),
+  };
+
+  base64Images: Images = {};
 
   outPath: string;
   compiledTemplate: any;
 
   constructor(outPath = path.normalize('/www/data/index.html')) {
     this.outPath = outPath;
-    this.logoBase64 = fs.readFileSync(this.logoPath);
+
+    this.base64Images = Object.entries(this.imagePaths)
+      .reduce((images, [name, path]) => {
+        images[name] = fs.readFileSync(path).toString('base64');
+        return images;
+      }, {});
+
     this.compiledTemplate = Handlebars.compile(fs.readFileSync(this.templatePath, {encoding: 'utf8'}));
   }
 
@@ -45,13 +65,20 @@ class HTMLReporter implements IReporter {
   }
 
   notifyChanges(changes: Array<PollState>, state: Array<PollState>) {
+    const someDown = state.some(([level, instance, url, online, latency]) => !online);
+
     const html = this.compiledTemplate({
       levels: this.nestState(state),
       updated: (new Date()).toISOString(),
-      logoBase64: this.logoBase64.toString('base64')
+      favicon: someDown ? this.base64Images.faviconDown : this.base64Images.faviconUp,
+      logo: someDown ? this.base64Images.logoDown : this.base64Images.logoUp,
     });
 
-    fs.writeFile(this.outPath, html, {encoding: 'utf8'}, (err) => console.error('Error writing html file', err));
+    fs.writeFile(this.outPath, html, {encoding: 'utf8'}, (err) => {
+      if (err) {
+        console.error('Error writing html file', err);
+      }
+    });
   }
 }
 
