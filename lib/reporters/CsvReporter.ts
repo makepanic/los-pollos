@@ -8,13 +8,13 @@ class CsvReporter implements IReporter {
   dir: string;
   suffix = 'poll.log';
 
-  constructor(dir) {
+  constructor(dir: string) {
     const stat = fs.statSync(dir);
     assert(stat.isDirectory(), 'reporter directory is a directory');
     this.dir = dir;
   }
 
-  logfileFor(level) {
+  logfileFor(level: string) {
     return path.join(this.dir, `${level}.${this.suffix}`);
   }
 

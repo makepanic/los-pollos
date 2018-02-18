@@ -1,12 +1,11 @@
 {
-  "typeRoots": [
-    "node_modules/@types"
-  ],
   "include": [
-    "lib/**/*",
+    "lib/**/*.ts",
+    "test/**/*.ts",
     "boot.ts"
   ],
   "compilerOptions": {
+    "noImplicitAny": false,
     "module": "commonjs",
     "target": "es6",
     "moduleResolution": "node",

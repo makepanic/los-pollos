@@ -1,6 +1,7 @@
 import got = require('got');
 import Reporter = require("./reporters/IReporter");
 import {PollState, PollInstance} from "./Types";
+import StateManager = require("./StateManager/StateManager");
 
 class Poller {
   state: Array<PollState> = [];
@@ -9,29 +10,30 @@ class Poller {
   interval: number = 15 * 1000;
   timeout: number = 10 * 1000;
   retries: number = 0;
+  stateManager: StateManager = new StateManager();
 
-  constructor(checks: Array<PollInstance>, reporters: Array<Reporter>) {
+  constructor(checks: PollInstance[], reporters: Reporter[]) {
     this.reporters = reporters;
 
     this.state = checks.map(([level, instance, url]) =>
       <PollState>[level, instance, url, true, 0]);
   }
 
-  request(url) {
+  request(url: string) {
     const before = Date.now();
     return got(url, {
       timeout: this.timeout,
       retries: this.retries,
-    }).then((response) => {
+    }).then((response: any) => {
       response._duration = Date.now() - before;
       return response;
-    }).catch(error => {
-      error._duration = 0;
+    }).catch((error: Error) => {
+      (error as any)._duration = 0;
       return error;
     });
   }
 
-  isError(result) {
+  isError(result: any) {
     const errorCodes = [502, 503, 504, 404, 400];
 
     return errorCodes.includes(result.statusCode) ||
@@ -44,23 +46,26 @@ class Poller {
       this.state.find(([oldLevel, oldInstance, oldUrl, oldUp]) => newLevel === oldLevel && newInstance === oldInstance && newUrl === oldUrl && newUp !== oldUp))
   }
 
-  poll() {
+  poll(): Promise<any> {
     const promises = this.state.map(([level, instance, url]) => {
       return this.request(url)
-        .then((result) => [level, instance, url, !this.isError(result), result._duration]);
+        .then((result: any) => [level, instance, url, !this.isError(result), result._duration]);
     });
 
-    return Promise.all(promises).then(newState => {
-      const changes = this.diffState(newState);
+    return Promise.all(promises)
+      .then(newState =>
+        newState.map((state: PollState) => this.stateManager.update(state)))
+      .then(newState => {
+        const changes = this.diffState(newState);
 
-      if (changes.length) {
-        this.reporters
-          .forEach(reporter => reporter.notifyChanges(changes, newState));
-      }
+        if (changes.length) {
+          this.reporters
+            .forEach(reporter => reporter.notifyChanges(changes, newState));
+        }
 
-      this.state = newState;
-    }).then(() =>
-      setTimeout(() => this.running && this.poll(), this.interval));
+        this.state = newState;
+      }).then(() =>
+        setTimeout(() => this.running && this.poll(), this.interval));
   }
 
   setup() {

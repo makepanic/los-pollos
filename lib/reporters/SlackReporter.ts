@@ -16,7 +16,7 @@ class SlackReporter implements IReporter {
   emojiLevelPending = ':yellow_heart:';
   emojiLevelUp = ':green_heart:';
 
-  constructor(token) {
+  constructor(token: string) {
     this.bot = new SlackBot({token});
   }
 
@@ -28,7 +28,7 @@ class SlackReporter implements IReporter {
     });
   }
 
-  postChangeMessage(options) {
+  postChangeMessage(options: any) {
     this.bot.postMessageToChannel(this.channel, '', options);
   }
 
@@ -62,7 +62,7 @@ class SlackReporter implements IReporter {
       });
 
       const levelTextBlocks = chunk(levelTexts, 3)
-        .map((_chunk) => _chunk.join(' '))
+        .map((_chunk: any) => _chunk.join(' '))
         .join('\n');
 
       this.postChangeMessage({

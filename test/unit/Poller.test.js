@@ -1,100 +1,78 @@
-const assert = require('assert');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const Poller = require('../../lib/Poller');
 const nock = require('nock');
-
-const Poller = require('../../build/lib/Poller');
-
-describe('Poller', function () {
-  beforeEach(() => {
+const ava_1 = require("ava");
+ava_1.default.beforeEach(() => {
     nock.cleanAll();
-  });
-
-  describe('request', function () {
-    it('resolves for successful requests', function () {
-      const poller = new Poller([], []);
-
-      nock('http://poller.app')
+});
+ava_1.default('resolves for successful requests', t => {
+    t.plan(0);
+    const poller = new Poller([], []);
+    nock('http://poller.app')
         .get('/')
         .reply(200);
-
-      return poller.request('http://poller.app/');
-    });
-    it('resolves for error requests', function () {
-      const poller = new Poller([], []);
-
-      nock('http://poller.app')
-        .get('/')
-        .reply(502);
-
-      return poller.request('http://poller.app/');
-    });
-  });
-
-  describe('isError', function () {
-    it('returns true for expected valid errors', function () {
-      const poller = new Poller([], []);
-
-      assert.ok(poller.isError({statusCode: 502}));
-      assert.ok(poller.isError({statusCode: 502}));
-      assert.ok(poller.isError({statusCode: 504}));
-      assert.ok(poller.isError({code: 'ECONNREFUSED'}));
-    });
-  });
-
-  describe('start', function () {
-    it('only allows to start once', function () {
-      let didPoll = false;
-      class NoopPoller extends Poller {
-        poll() {
-          didPoll = true;
-        }
-      }
-
-      const poller = new NoopPoller([], []);
-      poller.running = true;
-      poller.start();
-      assert.equal(didPoll, false);
-    });
-  });
-
-  describe('diffState', function () {
-    it('diffs two PollStates', function () {
-      // [string, string, string, boolean, number]
-      const initialState = ['foo', 'bar', 'http://poll.app', true];
-      const newState = ['foo', 'bar', 'http://poll.app', false];
-
-      const poller = new Poller([initialState], []);
-      assert.deepEqual(poller.diffState([]), []);
-      assert.deepEqual(poller.diffState([initialState]), []);
-      assert.deepEqual(poller.diffState([newState]), [newState]);
-    })
-  });
-
-  describe('poll', function () {
-    it('notifies reporters for changes', function (done) {
-      const initialState = ['foo', 'bar', 'http://poller.app/'];
-
-      class DummyReporter {
-        setup() {
-          return Promise.resolve();
-        }
-
-        notifyChanges([firstChange]) {
-          const [level, instance, url, up] = firstChange;
-          assert.equal(level, initialState[0]);
-          assert.equal(instance, initialState[1]);
-          assert.equal(url, initialState[2]);
-          assert.equal(up, false);
-          done();
-        }
-      }
-
-      nock('http://poller.app')
-        .get('/')
-        .reply(502);
-
-      const poller = new Poller([initialState], [new DummyReporter()]);
-      poller.poll();
-    });
-  })
+    return poller.request('http://poller.app/');
 });
-
+ava_1.default('resolves for error requests', t => {
+    t.plan(0);
+    const poller = new Poller([], []);
+    nock('http://poller.app')
+        .get('/')
+        .reply(502);
+    return poller.request('http://poller.app/');
+});
+ava_1.default('returns true for expected valid errors', t => {
+    const poller = new Poller([], []);
+    t.truthy(poller.isError({ statusCode: 502 }));
+    t.truthy(poller.isError({ statusCode: 502 }));
+    t.truthy(poller.isError({ statusCode: 504 }));
+    t.truthy(poller.isError({ code: 'ECONNREFUSED' }));
+});
+ava_1.default('only allows to start once', t => {
+    let didPoll = false;
+    class NoopPoller extends Poller {
+        constructor() {
+            //@ts-ignore
+            super([], []);
+        }
+        poll() {
+            didPoll = true;
+        }
+    }
+    const poller = new NoopPoller();
+    poller.running = true;
+    poller.start();
+    t.is(didPoll, false);
+});
+ava_1.default('diffs two PollStates', t => {
+    // [string, string, string, boolean, number]
+    const initialState = ['foo', 'bar', 'http://poll.app', true];
+    const newState = ['foo', 'bar', 'http://poll.app', false];
+    const poller = new Poller([initialState], []);
+    t.deepEqual(poller.diffState([]), []);
+    t.deepEqual(poller.diffState([initialState]), []);
+    t.deepEqual(poller.diffState([newState]), [newState]);
+});
+ava_1.default.cb('notifies reporters for changes', t => {
+    const initialState = ['foo', 'bar', 'http://poller.app/'];
+    class DummyReporter {
+        setup() {
+            return Promise.resolve();
+        }
+        notifyChanges([firstChange]) {
+            const [level, instance, url, up] = firstChange;
+            t.is(level, initialState[0]);
+            t.is(instance, initialState[1]);
+            t.is(url, initialState[2]);
+            t.is(up, false);
+            t.end();
+        }
+    }
+    nock('http://poller.app')
+        .get('/')
+        .reply(502);
+    const poller = new Poller([initialState], [new DummyReporter()]);
+    poller.interval = 100;
+    poller.poll();
+});

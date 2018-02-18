@@ -4,10 +4,8 @@ import fs = require('fs');
 import path = require('path');
 import Handlebars = require('handlebars');
 
-Handlebars.registerHelper('not', (a) => !a);
-Handlebars.registerHelper('capitalize', function (text) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-});
+Handlebars.registerHelper('not', (a: any) => !a);
+Handlebars.registerHelper('capitalize', (text: string) => text.charAt(0).toUpperCase() + text.slice(1));
 
 interface Images {
   logoUp?: string;
@@ -35,7 +33,7 @@ class HTMLReporter implements IReporter {
     this.outPath = outPath;
 
     this.base64Images = Object.entries(this.imagePaths)
-      .reduce((images, [name, path]) => {
+      .reduce((images: { [key: string]: string }, [name, path]) => {
         images[name] = fs.readFileSync(path).toString('base64');
         return images;
       }, {});
@@ -44,16 +42,22 @@ class HTMLReporter implements IReporter {
   }
 
   nestState(state: Array<PollState>) {
-    const levels = {};
+    const levels: {
+      [key: string]: {
+        name: string,
+        instances: { [key: string]: { name: string, online: boolean } }
+      }
+    } = {};
 
     state.forEach((state) => {
       const [level, instance, url, online, latency] = state;
       levels[level] = levels[level] || {name: level, instances: {}};
-      levels[level].instances[instance] = levels[level].instances[instance] || {name: instance};
 
-      levels[level].instances[instance] = {
-        online
-      }
+      // TODO: name isn't used if no instance
+      levels[level].instances[instance] = levels[level].instances[instance] ||
+        {name: instance, online: false};
+
+      levels[level].instances[instance].online = online;
     });
 
     return levels;
