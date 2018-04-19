@@ -6,7 +6,7 @@ test('stabilize', t => {
 
   {
     const state = [, , , true];
-    sm.stabilize({
+    let newState = sm.stabilize({
       stableState: state,
       buffer: [
         [, , , false],
@@ -14,12 +14,12 @@ test('stabilize', t => {
         [, , , false],
       ]
     });
-    t.is(state[3], false);
+    t.is(newState.stableState[3], false);
   }
 
   {
     const state = [, , , true];
-    sm.stabilize({
+    let newState = sm.stabilize({
       stableState: state,
       buffer: [
         [, , , false],
@@ -27,7 +27,7 @@ test('stabilize', t => {
         [, , , false],
       ]
     });
-    t.is(state[3], true);
+    t.is(newState.stableState[3], true);
   }
 });
 

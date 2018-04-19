@@ -38,6 +38,7 @@ class Poller {
 
     return errorCodes.includes(result.statusCode) ||
       result.code === 'ECONNREFUSED' ||
+      result.code === 'ENOTFOUND' ||
       result.code === 'ETIMEDOUT';
   }
 
@@ -63,7 +64,7 @@ class Poller {
             .forEach(reporter => reporter.notifyChanges(changes, newState));
         }
 
-        this.state = newState;
+        this.state = this.stateManager.stableStateFor(newState);
       }).then(() =>
         setTimeout(() => this.running && this.poll(), this.interval));
   }

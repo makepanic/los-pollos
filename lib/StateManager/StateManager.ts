@@ -1,5 +1,9 @@
 import {PollState} from "../Types";
 
+function deepClone<T>(object: T): T {
+  return JSON.parse(JSON.stringify(object));
+}
+
 interface StateBuffer {
   stableState: PollState;
   buffer: PollState[];
@@ -33,12 +37,7 @@ class StateManager {
   update(nextState: PollState): PollState {
     const key = this.keyFor(nextState);
 
-    if (!this.store.has(key)) {
-      this.store.set(key, {
-        stableState: nextState,
-        buffer: [],
-      });
-    }
+    this.ensureStoreState(nextState);
 
     const stateBuffer = this.store.get(key);
 
@@ -48,13 +47,36 @@ class StateManager {
       stateBuffer.buffer.shift();
     }
 
-    this.stabilize(stateBuffer);
-
-    this.store.set(key, stateBuffer);
+    this.store.set(key, this.stabilize(stateBuffer));
     return this.store.get(key).stableState;
   }
 
-  stabilize(stateBuffer: StateBuffer) {
+  stableStateFor(states: PollState[]) {
+    return states
+      .map(state => this.ensureStoreState(state))
+      .map(state => this.store.get(this.keyFor(state)).stableState)
+  }
+
+  ensureStoreState(state) {
+    const key = this.keyFor(state);
+
+    if (!this.store.has(key)) {
+      this.store.set(key, {
+        stableState: state,
+        buffer: [],
+      });
+    }
+
+    return state;
+  }
+
+  /**
+   * Takes a stateBuffer and stabilizes it.
+   * Returns the new stateBuffer afterwards.
+   * @param {StateBuffer} stateBuffer
+   * @return {StateBuffer}
+   */
+  stabilize(stateBuffer: StateBuffer): StateBuffer {
     if (stateBuffer.buffer.length) {
       const [, , , online] = stateBuffer.stableState;
       // we want to figure out if all in buffer are different than stable
@@ -63,9 +85,12 @@ class StateManager {
         .every(([, , , online]) => online === oppositeState);
 
       if (allChanged) {
-        stateBuffer.stableState[3] = oppositeState;
+        const clone = deepClone(stateBuffer);
+        clone.stableState[3] = oppositeState;
+        return clone;
       }
     }
+    return stateBuffer;
   }
 }
 
