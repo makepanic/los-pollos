@@ -1,5 +1,7 @@
 # los-pollos
 
+[![Build Status](https://travis-ci.org/makepanic/los-pollos.svg?branch=master)](https://travis-ci.org/makepanic/los-pollos)
+
 Application that takes a list of endpoints, polls them and notifies pluggable reporters if something changes.
 
 ## example usage
